@@ -1,0 +1,9 @@
+{
+	"scripts": {
+		"tw": "tailwind -o ./public/index.css",
+		"tw:watch": "pnpm tw -- --watch"
+	},
+	"devDependencies": {
+		"tailwindcss": "^3.0.23"
+	}
+}
