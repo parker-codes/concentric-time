@@ -73,6 +73,7 @@ name = "concentric-time"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "js-sys",
  "web-sys",
 ]
 

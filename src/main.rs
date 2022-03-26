@@ -1,6 +1,8 @@
 #![allow(non_snake_case)]
 
+use dioxus::core::to_owned;
 use dioxus::prelude::*;
+use js_sys::Date;
 use web_sys::console;
 
 fn main() {
@@ -9,8 +11,33 @@ fn main() {
 }
 
 fn App(cx: Scope) -> Element {
-    // let current_time = use_state(&cx, || 0);
-    // TODO: derive year, month, week, day, hour, minute, second from current_time
+    let current_time = use_state(&cx, || Date::new_0());
+    console::log_1(&format!("current_time: {}", current_time.to_iso_string()).into());
+    let breakdown = get_breakdown(*current_time.get());
+    let percentages = get_percentages(breakdown);
+
+    let callback = js_sys::Function::from(move |_| {
+        current_time.set(Date::new_0());
+        console::log_1(&format!("current_time: {}", current_time.to_iso_string()).into());
+    });
+
+    let window = web_sys::window().unwrap();
+    window.set_interval_with_callback_and_timeout_and_arguments_0(
+        callback.as_ref().unchecked_ref(),
+        1_000,
+    );
+
+    // let sync_task = use_coroutine(&cx, |rx| {
+    //     to_owned![current_time];
+
+    //     async move {
+    //         loop {
+    //             delay_ms(1000).await;
+    //             current_time.set(Date::now());
+    //             console::log_1(&format!("current_time: {}", current_time).into());
+    //         }
+    //     }
+    // });
 
     cx.render(rsx! {
         Ring { percent: 30.0, radius: 40.0, stroke: 8.5, color: RingColor::Blue }
@@ -58,14 +85,14 @@ fn Ring(
     let circumference = normalized_radius * 2.0 * std::f32::consts::PI;
     let stroke_dash_offset = circumference - percent / 100.0 * circumference;
 
-    console::log_1(&format!("stroke: {}", stroke).into());
-    console::log_1(&format!("stroke_color: {}", stroke_color).into());
-    console::log_1(&format!("radius: {}", radius).into());
-    console::log_1(&format!("diameter: {}", diameter).into());
-    console::log_1(&format!("normalized_radius: {}", normalized_radius).into());
-    console::log_1(&format!("circumference: {}", circumference).into());
-    console::log_1(&format!("percent: {}", percent).into());
-    console::log_1(&format!("stroke_dash_offset: {}", stroke_dash_offset).into());
+    // console::log_1(&format!("stroke: {}", stroke).into());
+    // console::log_1(&format!("stroke_color: {}", stroke_color).into());
+    // console::log_1(&format!("radius: {}", radius).into());
+    // console::log_1(&format!("diameter: {}", diameter).into());
+    // console::log_1(&format!("normalized_radius: {}", normalized_radius).into());
+    // console::log_1(&format!("circumference: {}", circumference).into());
+    // console::log_1(&format!("percent: {}", percent).into());
+    // console::log_1(&format!("stroke_dash_offset: {}", stroke_dash_offset).into());
 
     cx.render(rsx! {
         svg {
@@ -84,4 +111,22 @@ fn Ring(
             }
         }
     })
+}
+
+fn get_breakdown(current_time: Date) -> (u32, u32, u32, u32, u32, u32, u32) {
+    let year = current_time.get_full_year();
+    let month = current_time.get_month();
+    let week = 0u32;
+    let day = current_time.get_date();
+    let hour = current_time.get_hours();
+    let minute = current_time.get_minutes();
+    let second = current_time.get_seconds();
+
+    (year, month, week, day, hour, minute, second)
+}
+
+fn get_percentages(
+    breakdown: (u32, u32, u32, u32, u32, u32, u32),
+) -> (u32, u32, u32, u32, u32, u32, u32) {
+    unimplemented!()
 }
