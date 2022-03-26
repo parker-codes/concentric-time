@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"tw": "tailwind -o ./public/index.css",
+		"tw": "tailwind -o ./tmp/index.css",
 		"tw:watch": "pnpm tw -- --watch"
 	},
 	"devDependencies": {
