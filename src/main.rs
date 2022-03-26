@@ -13,8 +13,10 @@ fn App(cx: Scope) -> Element {
     // TODO: derive year, month, week, day, hour, minute, second from current_time
 
     cx.render(rsx! {
-        Ring { size: 80.0, stroke_width: 8.5, color: RingColor::Blue }
-        Ring { size: 400.0 }
+        Ring { percent: 30.0, radius: 40.0, stroke: 8.5, color: RingColor::Blue }
+        Ring { percent: 50.0, radius: 60.0, stroke: 6.5, color: RingColor::Green }
+        Ring { percent: 75.0, radius: 80.0, stroke: 5.0, color: RingColor::Red }
+        Ring { percent: 100.0, radius: 100.0 }
     })
 }
 
@@ -42,30 +44,43 @@ impl ToString for RingColor {
 }
 
 #[inline_props]
-fn Ring(cx: Scope, size: f32, stroke_width: Option<f32>, color: Option<RingColor>) -> Element {
-    let half = size / 2.0;
-    let stroke_width = stroke_width.unwrap_or(4.0);
-    let radius = half - stroke_width * 2.0;
+fn Ring(
+    cx: Scope,
+    percent: f32,
+    radius: f32,
+    color: Option<RingColor>,
+    stroke: Option<f32>,
+) -> Element {
+    let stroke = stroke.unwrap_or(4.0);
     let stroke_color = color.clone().unwrap_or_default().to_string();
+    let diameter = radius * 2.0;
+    let normalized_radius = radius - stroke * 2.0;
+    let circumference = normalized_radius * 2.0 * std::f32::consts::PI;
+    let stroke_dash_offset = circumference - percent / 100.0 * circumference;
 
-    console::log_1(&format!("size: {}", size).into());
-    console::log_1(&format!("half: {}", half).into());
-    console::log_1(&format!("stroke_width: {}", stroke_width).into());
-    console::log_1(&format!("radius: {}", radius).into());
+    console::log_1(&format!("stroke: {}", stroke).into());
     console::log_1(&format!("stroke_color: {}", stroke_color).into());
+    console::log_1(&format!("radius: {}", radius).into());
+    console::log_1(&format!("diameter: {}", diameter).into());
+    console::log_1(&format!("normalized_radius: {}", normalized_radius).into());
+    console::log_1(&format!("circumference: {}", circumference).into());
+    console::log_1(&format!("percent: {}", percent).into());
+    console::log_1(&format!("stroke_dash_offset: {}", stroke_dash_offset).into());
 
     cx.render(rsx! {
         svg {
-            width: "{size}",
-            height: "{size}",
+            width: "{diameter}",
+            height: "{diameter}",
 
             circle {
-                class: "{stroke_color}",
-                stroke_width: "{stroke_width}",
+                class: "{stroke_color} transition-[stroke-dashoffset] duration-[35ms] -rotate-90 origin-center translate-x-0",
+                stroke_dasharray: "{circumference} {circumference}",
+                stroke_dashoffset: "{stroke_dash_offset}",
+                stroke_width: "{stroke}",
                 fill: "transparent",
-                r: "{radius}",
-                cx: "{half}",
-                cy: "{half}"
+                r: "{normalized_radius}",
+                cx: "{radius}",
+                cy: "{radius}"
             }
         }
     })
