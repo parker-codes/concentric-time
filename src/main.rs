@@ -9,36 +9,64 @@ fn main() {
 }
 
 fn App(cx: Scope) -> Element {
+    // let current_time = use_state(&cx, || 0);
+    // TODO: derive year, month, week, day, hour, minute, second from current_time
+
     cx.render(rsx! {
-        div { "hello, wasm!" }
-        Counter {}
-        Uppercase { text: "well, hello there".into() }
+        Ring { size: 80.0, stroke_width: 8.5, color: RingColor::Blue }
+        Ring { size: 400.0 }
     })
 }
 
-fn Counter(cx: Scope) -> Element {
-    let count = use_state(&cx, || 0);
-
-    cx.render(rsx! {
-        div {
-            button {
-                class: "px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:bg-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150",
-                onclick: move |_| {
-                    count.set(count.get() + 1);
-                },
-                "{count}"
-            }
+#[derive(PartialEq, Clone)]
+enum RingColor {
+    Gray,
+    Red,
+    Green,
+    Blue,
+}
+impl Default for RingColor {
+    fn default() -> Self {
+        RingColor::Gray
+    }
+}
+impl ToString for RingColor {
+    fn to_string(&self) -> String {
+        match self {
+            RingColor::Gray => String::from("stroke-gray-500"),
+            RingColor::Red => String::from("stroke-red-500"),
+            RingColor::Green => String::from("stroke-green-500"),
+            RingColor::Blue => String::from("stroke-blue-500"),
         }
-    })
+    }
 }
 
 #[inline_props]
-fn Uppercase(cx: Scope, text: String) -> Element {
-    let transformed = text.to_uppercase();
+fn Ring(cx: Scope, size: f32, stroke_width: Option<f32>, color: Option<RingColor>) -> Element {
+    let half = size / 2.0;
+    let stroke_width = stroke_width.unwrap_or(4.0);
+    let radius = half - stroke_width * 2.0;
+    let stroke_color = color.clone().unwrap_or_default().to_string();
+
+    console::log_1(&format!("size: {}", size).into());
+    console::log_1(&format!("half: {}", half).into());
+    console::log_1(&format!("stroke_width: {}", stroke_width).into());
+    console::log_1(&format!("radius: {}", radius).into());
+    console::log_1(&format!("stroke_color: {}", stroke_color).into());
+
     cx.render(rsx! {
-        span {
-            class: "text-xl font-bold text-red-500",
-            "{transformed}"
+        svg {
+            width: "{size}",
+            height: "{size}",
+
+            circle {
+                class: "{stroke_color}",
+                stroke_width: "{stroke_width}",
+                fill: "transparent",
+                r: "{radius}",
+                cx: "{half}",
+                cy: "{half}"
+            }
         }
     })
 }
