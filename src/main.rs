@@ -1,6 +1,5 @@
 #![allow(non_snake_case)]
 
-use dioxus::core::to_owned;
 use dioxus::prelude::*;
 use js_sys::Date;
 use web_sys::console;
@@ -12,32 +11,19 @@ fn main() {
 
 fn App(cx: Scope) -> Element {
     let current_time = use_state(&cx, || Date::new_0());
-    console::log_1(&format!("current_time: {}", current_time.to_iso_string()).into());
-    let breakdown = get_breakdown(*current_time.get());
-    let percentages = get_percentages(breakdown);
+    // let breakdown = get_breakdown(current_time.get());
+    // let percentages = get_percentages(breakdown);
 
-    let callback = js_sys::Function::from(move |_| {
-        current_time.set(Date::new_0());
-        console::log_1(&format!("current_time: {}", current_time.to_iso_string()).into());
+    use_future(&cx, current_time, move |current_time| {
+        let mut interval = async_timer::Interval::platform_new(core::time::Duration::from_secs(1));
+        async move {
+            loop {
+                interval.as_mut().await;
+                current_time.set(Date::new_0());
+                console::log_1(&format!("current_time: {}", current_time.to_iso_string()).into());
+            }
+        }
     });
-
-    let window = web_sys::window().unwrap();
-    window.set_interval_with_callback_and_timeout_and_arguments_0(
-        callback.as_ref().unchecked_ref(),
-        1_000,
-    );
-
-    // let sync_task = use_coroutine(&cx, |rx| {
-    //     to_owned![current_time];
-
-    //     async move {
-    //         loop {
-    //             delay_ms(1000).await;
-    //             current_time.set(Date::now());
-    //             console::log_1(&format!("current_time: {}", current_time).into());
-    //         }
-    //     }
-    // });
 
     cx.render(rsx! {
         Ring { percent: 30.0, radius: 40.0, stroke: 8.5, color: RingColor::Blue }
@@ -113,7 +99,7 @@ fn Ring(
     })
 }
 
-fn get_breakdown(current_time: Date) -> (u32, u32, u32, u32, u32, u32, u32) {
+fn get_breakdown(current_time: &Date) -> (u32, u32, u32, u32, u32, u32, u32) {
     let year = current_time.get_full_year();
     let month = current_time.get_month();
     let week = 0u32;
