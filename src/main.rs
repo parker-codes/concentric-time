@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use dioxus::prelude::*;
+use dioxus::{core::to_owned, prelude::*};
 use js_sys::Date;
 use web_sys::console;
 
@@ -14,18 +14,22 @@ fn App(cx: Scope) -> Element {
     // let breakdown = get_breakdown(current_time.get());
     // let percentages = get_percentages(breakdown);
 
-    use_future(&cx, current_time, move |current_time| {
+    use_coroutine(&cx, |_rx: UnboundedReceiver<()>| {
+        to_owned![current_time];
         let mut interval = async_timer::Interval::platform_new(core::time::Duration::from_secs(1));
         async move {
             loop {
-                interval.as_mut().await;
+                interval.wait().await;
                 current_time.set(Date::new_0());
-                console::log_1(&format!("current_time: {}", current_time.to_iso_string()).into());
             }
         }
     });
 
+    let current_time_formatted = current_time.get().to_iso_string();
+    console::log_1(&format!("current_time: {}", current_time.get().to_iso_string()).into());
+
     cx.render(rsx! {
+        div { "{current_time_formatted}" }
         Ring { percent: 30.0, radius: 40.0, stroke: 8.5, color: RingColor::Blue }
         Ring { percent: 50.0, radius: 60.0, stroke: 6.5, color: RingColor::Green }
         Ring { percent: 75.0, radius: 80.0, stroke: 5.0, color: RingColor::Red }
