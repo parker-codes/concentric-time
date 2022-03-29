@@ -1,5 +1,7 @@
 #![allow(non_snake_case)]
 
+use async_timer::Interval;
+use core::time::Duration;
 use dioxus::{core::to_owned, prelude::*};
 use js_sys::Date;
 use web_sys::console;
@@ -16,7 +18,7 @@ fn App(cx: Scope) -> Element {
 
     use_coroutine(&cx, |_rx: UnboundedReceiver<()>| {
         to_owned![current_time];
-        let mut interval = async_timer::Interval::platform_new(core::time::Duration::from_secs(1));
+        let mut interval = Interval::platform_new(Duration::from_secs(1));
         async move {
             loop {
                 interval.wait().await;
