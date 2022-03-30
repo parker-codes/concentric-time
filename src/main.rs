@@ -14,14 +14,9 @@ fn main() {
 fn App(cx: Scope) -> Element {
     let current_time = use_state(&cx, || Date::new_0());
     let current_time_formatted = current_time.get().to_iso_string();
-    console::log_1(&format!("current_time: {}", current_time.get().to_iso_string()).into());
 
     let breakdown = get_breakdown(current_time.get());
-    console::log_1(&format!("breakdown: {:?}", breakdown).into());
     let percentages = get_percentages(breakdown);
-    console::log_1(&format!("percentages: {:?}", percentages).into());
-
-    console::log_1(&format!("SECONDS_IN_YEAR: {}", SECONDS_IN_YEAR).into());
 
     use_coroutine(&cx, |_rx: UnboundedReceiver<()>| {
         to_owned![current_time];
@@ -82,15 +77,6 @@ fn Ring(
     let normalized_radius = radius - stroke * 2.0;
     let circumference = normalized_radius * 2.0 * std::f32::consts::PI;
     let stroke_dash_offset = circumference - percent / 100.0 * circumference;
-
-    // console::log_1(&format!("stroke: {}", stroke).into());
-    // console::log_1(&format!("stroke_color: {}", stroke_color).into());
-    // console::log_1(&format!("radius: {}", radius).into());
-    // console::log_1(&format!("diameter: {}", diameter).into());
-    // console::log_1(&format!("normalized_radius: {}", normalized_radius).into());
-    // console::log_1(&format!("circumference: {}", circumference).into());
-    // console::log_1(&format!("percent: {}", percent).into());
-    // console::log_1(&format!("stroke_dash_offset: {}", stroke_dash_offset).into());
 
     cx.render(rsx! {
         svg {
