@@ -13,7 +13,6 @@ fn main() {
 
 fn App(cx: Scope) -> Element {
     let current_time = use_state(&cx, || Date::new_0());
-    let current_time_formatted = current_time.get().to_iso_string();
 
     let breakdown = get_breakdown(current_time.get());
     let percentages = get_percentages(breakdown);
@@ -30,7 +29,7 @@ fn App(cx: Scope) -> Element {
     });
 
     cx.render(rsx! {
-        div { "{current_time_formatted}" }
+        TimeDisplay { time: current_time.get().clone() }
         Ring { label: "Year".into(), percent: percentages.0, radius: 40.0, stroke: 8.5, color: RingColor::Blue }
         Ring { label: "Month".into(), percent: percentages.1, radius: 60.0, stroke: 6.5, color: RingColor::Green }
         Ring { label: "Day".into(), percent: percentages.2, radius: 80.0, stroke: 5.0, color: RingColor::Red }
@@ -63,6 +62,18 @@ impl ToString for RingColor {
 }
 
 #[inline_props]
+fn TimeDisplay(cx: Scope, time: Date) -> Element {
+    let current_time_formatted = time.to_iso_string();
+
+    cx.render(rsx! {
+        div {
+            class: "text-gray-700",
+            "{current_time_formatted}"
+        }
+    })
+}
+
+#[inline_props]
 fn Ring(
     cx: Scope,
     label: Option<String>,
@@ -70,6 +81,7 @@ fn Ring(
     radius: f32,
     color: Option<RingColor>,
     stroke: Option<f32>,
+    class: Option<String>,
 ) -> Element {
     let stroke = stroke.unwrap_or(4.0);
     let stroke_color = color.clone().unwrap_or_default().to_string();
@@ -77,6 +89,7 @@ fn Ring(
     let normalized_radius = radius - stroke * 2.0;
     let circumference = normalized_radius * 2.0 * std::f32::consts::PI;
     let stroke_dash_offset = circumference - percent / 100.0 * circumference;
+    let class = class.clone().unwrap_or_default();
 
     cx.render(rsx! {
         svg {
@@ -84,7 +97,7 @@ fn Ring(
             height: "{diameter}",
 
             circle {
-                class: "{stroke_color} transition-[stroke-dashoffset] duration-1000 -rotate-90 origin-center translate-x-0",
+                class: "{class} {stroke_color} transition-[stroke-dashoffset] duration-1000 -rotate-90 origin-center translate-x-0",
                 stroke_dasharray: "{circumference} {circumference}",
                 stroke_dashoffset: "{stroke_dash_offset}",
                 stroke_width: "{stroke}",
