@@ -33,11 +33,11 @@ fn App(cx: Scope) -> Element {
 
         div {
             class: "w-full h-full grid grid-cols-1 grid-rows-1 place-items-center",
-            Ring { label: "Year".into(), percent: percentages.0, radius: 40.0, stroke: 8.5, color: RingColor::Blue }
-            Ring { label: "Month".into(), percent: percentages.1, radius: 60.0, stroke: 6.5, color: RingColor::Green }
-            Ring { label: "Day".into(), percent: percentages.2, radius: 80.0, stroke: 5.0, color: RingColor::Red }
-            Ring { label: "Hour".into(), percent: percentages.3, radius: 100.0 }
-            Ring { label: "Minute".into(), percent: percentages.4, radius: 100.0 }
+            Ring { label: "Year".into(), percent: percentages.0, radius: 60.0, stroke: 12.0, color: RingColor::Blue }
+            Ring { label: "Month".into(), percent: percentages.1, radius: 100.0, stroke: 10.0, color: RingColor::Green }
+            Ring { label: "Day".into(), percent: percentages.2, radius: 140.0, stroke: 8.0, color: RingColor::Red }
+            Ring { label: "Hour".into(), percent: percentages.3, radius: 180.0, stroke: 6.0 }
+            Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0, stroke: 4.0 }
         }
     })
 }
