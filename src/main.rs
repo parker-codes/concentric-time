@@ -87,10 +87,12 @@ fn Ring(
     stroke: Option<f32>,
     class: Option<String>,
 ) -> Element {
+    let label = label.clone().unwrap_or_default();
     let stroke = stroke.unwrap_or(4.0);
     let stroke_color = color.clone().unwrap_or_default().to_string();
     let diameter = radius * 2.0;
     let normalized_radius = radius - stroke * 2.0;
+    let outer_path = radius + stroke;
     let circumference = normalized_radius * 2.0 * std::f32::consts::PI;
     let stroke_dash_offset = circumference - percent / 100.0 * circumference;
     let class = class.clone().unwrap_or_default();
@@ -110,6 +112,25 @@ fn Ring(
                 r: "{normalized_radius}",
                 cx: "{radius}",
                 cy: "{radius}"
+            }
+
+            defs {
+                // TODO: rotate text to top right
+                circle {
+                    id: "label-{label}",
+                    stroke_dasharray: "{circumference} {circumference}",
+                    r: "{normalized_radius}", // TODO: fix size so text isn't cut off
+                    cx: "{outer_path}",
+                    cy: "{outer_path}"
+                }
+            }
+
+            text {
+                textPath {
+                    href: "#label-{label}",
+                    class: "text-sm",
+                    "{label}"
+                }
             }
         }
     })
