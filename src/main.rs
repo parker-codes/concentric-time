@@ -33,11 +33,11 @@ fn App(cx: Scope) -> Element {
 
         div {
             class: "w-full h-full grid grid-cols-1 grid-rows-1 place-items-center",
-            Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0 }
-            Ring { label: "Hour".into(), percent: percentages.3, radius: 180.0 }
-            Ring { label: "Day".into(), percent: percentages.2, radius: 140.0, color: RingColor::Red }
-            Ring { label: "Month".into(), percent: percentages.1, radius: 100.0, color: RingColor::Green }
-            Ring { label: "Year".into(), percent: percentages.0, radius: 60.0, color: RingColor::Blue }
+            Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0, color: RingColor::Violet }
+            Ring { label: "Hour".into(),   percent: percentages.3, radius: 180.0, color: RingColor::Blue }
+            Ring { label: "Day".into(),    percent: percentages.2, radius: 140.0, color: RingColor::Green }
+            Ring { label: "Month".into(),  percent: percentages.1, radius: 100.0, color: RingColor::Yellow }
+            Ring { label: "Year".into(),   percent: percentages.0, radius: 60.0,  color: RingColor::Red }
         }
     })
 }
@@ -46,8 +46,10 @@ fn App(cx: Scope) -> Element {
 enum RingColor {
     Gray,
     Red,
+    Yellow,
     Green,
     Blue,
+    Violet,
 }
 impl Default for RingColor {
     fn default() -> Self {
@@ -59,8 +61,10 @@ impl ToString for RingColor {
         match self {
             RingColor::Gray => String::from("stroke-gray-500"),
             RingColor::Red => String::from("stroke-red-500"),
+            RingColor::Yellow => String::from("stroke-yellow-400"),
             RingColor::Green => String::from("stroke-green-500"),
             RingColor::Blue => String::from("stroke-blue-500"),
+            RingColor::Violet => String::from("stroke-violet-600"),
         }
     }
 }
@@ -115,11 +119,10 @@ fn Ring(
             }
 
             defs {
-                // TODO: rotate text to top right
                 circle {
                     id: "label-{label}",
                     stroke_dasharray: "{circumference} {circumference}",
-                    r: "{normalized_radius}", // TODO: fix size so text isn't cut off
+                    r: "{normalized_radius}",
                     cx: "{outer_path}",
                     cy: "{outer_path}"
                 }
