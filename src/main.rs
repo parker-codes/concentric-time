@@ -33,11 +33,11 @@ fn App(cx: Scope) -> Element {
 
         div {
             class: "w-full h-full grid grid-cols-1 grid-rows-1 place-items-center",
-            Ring { label: "Year".into(), percent: percentages.0, radius: 60.0, stroke: 12.0, color: RingColor::Blue }
-            Ring { label: "Month".into(), percent: percentages.1, radius: 100.0, stroke: 10.0, color: RingColor::Green }
-            Ring { label: "Day".into(), percent: percentages.2, radius: 140.0, stroke: 8.0, color: RingColor::Red }
-            Ring { label: "Hour".into(), percent: percentages.3, radius: 180.0, stroke: 6.0 }
-            Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0, stroke: 4.0 }
+            Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0 }
+            Ring { label: "Hour".into(), percent: percentages.3, radius: 180.0 }
+            Ring { label: "Day".into(), percent: percentages.2, radius: 140.0, color: RingColor::Red }
+            Ring { label: "Month".into(), percent: percentages.1, radius: 100.0, color: RingColor::Green }
+            Ring { label: "Year".into(), percent: percentages.0, radius: 60.0, color: RingColor::Blue }
         }
     })
 }
@@ -88,7 +88,7 @@ fn Ring(
     class: Option<String>,
 ) -> Element {
     let label = label.clone().unwrap_or_default();
-    let stroke = stroke.unwrap_or(4.0);
+    let stroke = stroke.unwrap_or(10.0);
     let stroke_color = color.clone().unwrap_or_default().to_string();
     let diameter = radius * 2.0;
     let normalized_radius = radius - stroke * 2.0;
