@@ -56,8 +56,8 @@ impl Default for RingColor {
         RingColor::Gray
     }
 }
-impl ToString for RingColor {
-    fn to_string(&self) -> String {
+impl RingColor {
+    fn as_stroke(&self) -> String {
         match self {
             RingColor::Gray => String::from("stroke-gray-500"),
             RingColor::Red => String::from("stroke-red-500"),
@@ -65,6 +65,17 @@ impl ToString for RingColor {
             RingColor::Green => String::from("stroke-green-500"),
             RingColor::Blue => String::from("stroke-blue-500"),
             RingColor::Violet => String::from("stroke-violet-600"),
+        }
+    }
+
+    fn as_fill(&self) -> String {
+        match self {
+            RingColor::Gray => String::from("fill-gray-500"),
+            RingColor::Red => String::from("fill-red-500"),
+            RingColor::Yellow => String::from("fill-yellow-400"),
+            RingColor::Green => String::from("fill-green-500"),
+            RingColor::Blue => String::from("fill-blue-500"),
+            RingColor::Violet => String::from("fill-violet-600"),
         }
     }
 }
@@ -93,7 +104,9 @@ fn Ring(
 ) -> Element {
     let label = label.clone().unwrap_or_default();
     let stroke = stroke.unwrap_or(10.0);
-    let stroke_color = color.clone().unwrap_or_default().to_string();
+    let color = color.clone().unwrap_or_default();
+    let stroke_color = color.as_stroke();
+    let fill_color = color.as_fill();
     let diameter = radius * 2.0;
     let normalized_radius = radius - stroke * 2.0;
     let outer_path = radius + stroke;
@@ -132,7 +145,7 @@ fn Ring(
                 class: "origin-center -rotate-90 -translate-x-1 transition-opacity duration-500 opacity-0 group-hover:opacity-100",
                 textPath {
                     href: "#label-{label}",
-                    class: "text-xs",
+                    class: "text-xs font-bold {stroke_color} {fill_color}",
                     "{label}"
                 }
             }
