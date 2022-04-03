@@ -99,7 +99,7 @@ fn Ring(
 
     cx.render(rsx! {
         svg {
-            class: "row-start-1 row-span-1 col-start-1 col-span-1",
+            class: "group row-start-1 row-span-1 col-start-1 col-span-1",
             width: "{diameter}",
             height: "{diameter}",
 
@@ -126,9 +126,10 @@ fn Ring(
             }
 
             text {
+                class: "origin-center -rotate-90 -translate-x-1 transition-opacity duration-500 opacity-0 group-hover:opacity-100",
                 textPath {
                     href: "#label-{label}",
-                    class: "text-sm",
+                    class: "text-xs",
                     "{label}"
                 }
             }
