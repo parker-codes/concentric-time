@@ -29,15 +29,19 @@ fn App(cx: Scope) -> Element {
     });
 
     cx.render(rsx! {
-        TimeDisplay { time: current_time.get().clone() }
-
         div {
-            class: "w-full h-full grid grid-cols-1 grid-rows-1 place-items-center",
-            Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0, color: RingColor::Violet }
-            Ring { label: "Hour".into(),   percent: percentages.3, radius: 180.0, color: RingColor::Blue }
-            Ring { label: "Day".into(),    percent: percentages.2, radius: 140.0, color: RingColor::Green }
-            Ring { label: "Month".into(),  percent: percentages.1, radius: 100.0, color: RingColor::Yellow }
-            Ring { label: "Year".into(),   percent: percentages.0, radius: 60.0,  color: RingColor::Red }
+            class: "w-full h-full flex flex-col justify-center items-center gap-y-12",
+
+            TimeDisplay { time: current_time.get().clone() }
+
+            div {
+                class: "grid grid-cols-1 grid-rows-1 place-items-center",
+                Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0, color: RingColor::Violet }
+                Ring { label: "Hour".into(),   percent: percentages.3, radius: 180.0, color: RingColor::Blue }
+                Ring { label: "Day".into(),    percent: percentages.2, radius: 140.0, color: RingColor::Green }
+                Ring { label: "Month".into(),  percent: percentages.1, radius: 100.0, color: RingColor::Yellow }
+                Ring { label: "Year".into(),   percent: percentages.0, radius: 60.0,  color: RingColor::Red }
+            }
         }
     })
 }
@@ -82,12 +86,20 @@ impl RingColor {
 
 #[inline_props]
 fn TimeDisplay(cx: Scope, time: Date) -> Element {
-    let current_time_formatted = time.to_iso_string();
+    let date = time.to_date_string();
+    let time = time.to_locale_time_string("en-US");
 
     cx.render(rsx! {
         div {
-            class: "text-gray-700",
-            "{current_time_formatted}"
+            class: "flex flex-col items-end gap-y-2 tracking-wide font-bold",
+            span {
+                class: "text-gray-500 text-xl",
+                "{date}"
+            }
+            span {
+                class: "text-gray-700 text-7xl",
+                "{time}"
+            }
         }
     })
 }
