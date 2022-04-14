@@ -137,6 +137,7 @@ fn Ring(
                 stroke_dasharray: "{circumference} {circumference}",
                 stroke_dashoffset: "{stroke_dash_offset}",
                 stroke_width: "{stroke}",
+                stroke_linecap: "round",
                 fill: "transparent",
                 r: "{normalized_radius}",
                 cx: "{radius}",
