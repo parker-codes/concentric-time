@@ -1,6 +1,6 @@
 # Concentric Time
 
-A simple and fun way to view your clock!
+A simple and fun way to view the time!
 
 ---
 
