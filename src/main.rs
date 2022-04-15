@@ -30,7 +30,7 @@ fn App(cx: Scope) -> Element {
 
     cx.render(rsx! {
         div {
-            class: "p-4 w-full h-full flex flex-col justify-center items-center sm:gap-y-12",
+            class: "p-4 w-full h-full flex flex-col justify-center items-center sm:gap-y-12 dark:bg-slate-900",
 
             TimeDisplay { time: current_time.get().clone() }
 
@@ -63,23 +63,23 @@ impl Default for RingColor {
 impl RingColor {
     fn as_stroke(&self) -> String {
         match self {
-            RingColor::Gray => String::from("stroke-gray-500"),
+            RingColor::Gray => String::from("stroke-gray-500 dark:stroke-gray-400"),
             RingColor::Red => String::from("stroke-red-500"),
             RingColor::Yellow => String::from("stroke-yellow-400"),
             RingColor::Green => String::from("stroke-green-500"),
             RingColor::Blue => String::from("stroke-blue-500"),
-            RingColor::Violet => String::from("stroke-violet-600"),
+            RingColor::Violet => String::from("stroke-violet-600 dark:stroke-violet-500"),
         }
     }
 
     fn as_fill(&self) -> String {
         match self {
-            RingColor::Gray => String::from("fill-gray-500"),
+            RingColor::Gray => String::from("fill-gray-500 dark:fill-gray-400"),
             RingColor::Red => String::from("fill-red-500"),
             RingColor::Yellow => String::from("fill-yellow-400"),
             RingColor::Green => String::from("fill-green-500"),
             RingColor::Blue => String::from("fill-blue-500"),
-            RingColor::Violet => String::from("fill-violet-600"),
+            RingColor::Violet => String::from("fill-violet-600 dark:fill-violet-500"),
         }
     }
 }
@@ -93,11 +93,11 @@ fn TimeDisplay(cx: Scope, time: Date) -> Element {
         div {
             class: "flex flex-col items-end gap-y-2 tracking-wide font-bold",
             span {
-                class: "text-gray-500 text-xl",
+                class: "text-xl text-gray-500 dark:text-gray-400",
                 "{date}"
             }
             span {
-                class: "text-gray-700 text-4xl sm:text-7xl",
+                class: "text-4xl sm:text-7xl text-gray-700 dark:text-gray-300",
                 "{time}"
             }
         }
