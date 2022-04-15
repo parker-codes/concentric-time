@@ -30,12 +30,12 @@ fn App(cx: Scope) -> Element {
 
     cx.render(rsx! {
         div {
-            class: "w-full h-full flex flex-col justify-center items-center gap-y-12",
+            class: "p-4 w-full h-full flex flex-col justify-center items-center sm:gap-y-12",
 
             TimeDisplay { time: current_time.get().clone() }
 
             div {
-                class: "grid grid-cols-1 grid-rows-1 place-items-center",
+                class: "grid grid-cols-1 grid-rows-1 place-items-center scale-75 sm:scale-100",
                 Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0, color: RingColor::Violet }
                 Ring { label: "Hour".into(),   percent: percentages.3, radius: 180.0, color: RingColor::Blue }
                 Ring { label: "Day".into(),    percent: percentages.2, radius: 140.0, color: RingColor::Green }
@@ -97,7 +97,7 @@ fn TimeDisplay(cx: Scope, time: Date) -> Element {
                 "{date}"
             }
             span {
-                class: "text-gray-700 text-7xl",
+                class: "text-gray-700 text-4xl sm:text-7xl",
                 "{time}"
             }
         }
