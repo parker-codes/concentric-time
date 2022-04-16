@@ -87,7 +87,6 @@ dependencies = [
  "async-timer",
  "dioxus",
  "js-sys",
- "web-sys",
 ]
 
 [[package]]

@@ -4,10 +4,8 @@ use async_timer::Interval;
 use core::time::Duration;
 use dioxus::{core::to_owned, prelude::*};
 use js_sys::Date;
-use web_sys::console;
 
 fn main() {
-    console::log_1(&"Hello, world!".into());
     dioxus::web::launch(App);
 }
 
