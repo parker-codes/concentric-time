@@ -121,7 +121,6 @@ fn Ring(
     let fill_color = color.as_fill();
     let diameter = radius * 2.0;
     let normalized_radius = radius - stroke * 2.0;
-    let outer_path = radius + stroke;
     let circumference = normalized_radius * 2.0 * std::f32::consts::PI;
     let stroke_dash_offset = circumference - percent / 100.0 * circumference;
     let class = class.clone().unwrap_or_default();
@@ -145,20 +144,22 @@ fn Ring(
             }
 
             defs {
-                circle {
+                path {
                     id: "label-{label}",
-                    stroke_dasharray: "{circumference} {circumference}",
-                    r: "{normalized_radius}",
-                    cx: "{outer_path}",
-                    cy: "{outer_path}"
+                    d: r#"
+                        M 0,{radius}
+                        a {radius},{radius} 0 1,1 {diameter},0
+                        {radius},{radius} 0 1,1 -{diameter},0
+                    "#
                 }
             }
 
             text {
-                class: "origin-center -rotate-90 -translate-x-1 transition-opacity duration-500 opacity-0 group-hover:opacity-100",
+                class: "origin-center rotate-90 opacity-0 transition-opacity duration-500 group-hover:opacity-100 tracking-widest",
                 textPath {
                     href: "#label-{label}",
                     class: "text-xs font-bold {stroke_color} {fill_color}",
+                    alignment_baseline: "hanging",
                     "{label}"
                 }
             }
