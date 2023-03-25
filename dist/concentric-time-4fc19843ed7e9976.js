@@ -311,7 +311,7 @@ async function load(module, imports) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('concentric-time-d4795076806ee0b7_bg.wasm', import.meta.url);
+        input = new URL('concentric-time-4fc19843ed7e9976_bg.wasm', import.meta.url);
     }
     const imports = {};
     imports.wbg = {};

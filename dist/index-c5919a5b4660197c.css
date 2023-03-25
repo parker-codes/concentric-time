@@ -585,6 +585,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   row-gap: 0.5rem;
 }
 
+.rounded-\[50\%\] {
+  border-radius: 50%;
+}
+
 .fill-gray-500 {
   fill: #6b7280;
 }
@@ -687,6 +691,18 @@ Ensure the default browser behavior of the `hidden` attribute.
   opacity: 0;
 }
 
+.outline-dotted {
+  outline-style: dotted;
+}
+
+.outline-2 {
+  outline-width: 2px;
+}
+
+.outline-transparent {
+  outline-color: transparent;
+}
+
 .transition-\[stroke-dashoffset\] {
   transition-property: stroke-dashoffset;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -705,6 +721,14 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .duration-500 {
   transition-duration: 500ms;
+}
+
+.group:focus-within .group-focus-within\:opacity-100 {
+  opacity: 1;
+}
+
+.group:focus-within .group-focus-within\:outline-slate-200 {
+  outline-color: #e2e8f0;
 }
 
 .group:hover .group-hover\:opacity-100 {
