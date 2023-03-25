@@ -132,7 +132,8 @@ fn Ring(
             height: "{diameter}",
 
             circle {
-                class: "{class} {stroke_color} transition-[stroke-dashoffset] duration-1000 -rotate-90 origin-center translate-x-0",
+                class: "{class} {stroke_color} transition-[stroke-dashoffset] duration-1000 -rotate-90 origin-center translate-x-0 rounded-[50%] outline-dotted outline-2 outline-transparent group-focus-within:outline-slate-200",
+                tabindex: "0",
                 stroke_dasharray: "{circumference} {circumference}",
                 stroke_dashoffset: "{stroke_dash_offset}",
                 stroke_width: "{stroke}",
@@ -155,7 +156,7 @@ fn Ring(
             }
 
             text {
-                class: "origin-center rotate-90 opacity-0 transition-opacity duration-500 group-hover:opacity-100 tracking-widest",
+                class: "origin-center rotate-90 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100 tracking-widest",
                 textPath {
                     href: "#label-{label}",
                     class: "text-xs font-bold {stroke_color} {fill_color}",
