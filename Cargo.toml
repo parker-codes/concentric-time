@@ -3,9 +3,22 @@ name = "concentric-time"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-async-timer = "1.0.0-beta.8"
-dioxus = { git = "https://github.com/DioxusLabs/dioxus", branch = "master", features = ["web"] }
-js-sys = "0.3.56"
+console_error_panic_hook = "0.1.7"
+js-sys = "0.3.69"
+leptos = { version = "0.6.11", features = ["csr", "nightly"] }
+
+# Defines a size-optimized profile for the WASM bundle in release mode
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[package.metadata.leptos]
+tailwind-input-file = "style/tailwind.css"
+# The profile to use for the lib target when compiling for release
+lib-profile-release = "wasm-release"
+#  The browserlist query used for optimizing the CSS.
+browserquery = "defaults"
