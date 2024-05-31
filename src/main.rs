@@ -1,52 +1,132 @@
-#![allow(non_snake_case)]
-
-use async_timer::Interval;
 use core::time::Duration;
-use dioxus::{core::to_owned, prelude::*};
 use js_sys::Date;
+use leptos::*;
 
-fn main() {
-    dioxus::web::launch(App);
+pub fn main() {
+    console_error_panic_hook::set_once();
+
+    mount_to_body(App);
 }
 
-fn App(cx: Scope) -> Element {
-    let current_time = use_state(&cx, || Date::new_0());
+#[component]
+fn App() -> impl IntoView {
+    let (current_time, set_current_time) = create_signal(Date::new_0());
+    set_interval(
+        move || {
+            set_current_time(Date::new_0());
+        },
+        Duration::from_secs(1),
+    );
 
-    let breakdown = get_breakdown(current_time.get());
-    let percentages = get_percentages(breakdown);
+    let breakdown = move || get_breakdown(&current_time());
+    let percentages = move || get_percentages(breakdown());
 
-    use_coroutine(&cx, |_rx: UnboundedReceiver<()>| {
-        to_owned![current_time];
-        let mut interval = Interval::platform_new(Duration::from_secs(1));
-        async move {
-            loop {
-                interval.wait().await;
-                current_time.set(Date::new_0());
-            }
-        }
-    });
+    let minute_percentage = move || percentages().4;
+    let hour_percentage = move || percentages().3;
+    let day_percentage = move || percentages().2;
+    let month_percentage = move || percentages().1;
+    let year_percentage = move || percentages().0;
 
-    cx.render(rsx! {
-        div {
-            class: "p-4 w-full h-full flex flex-col justify-center items-center sm:gap-y-12 dark:bg-slate-900",
+    // create_effect(move |_| {
+    //     logging::log!("minute_percentage = {}", minute_percentage());
+    // });
 
-            TimeDisplay { time: current_time.get().clone() }
+    view! {
+        <div class="p-4 w-full h-full flex flex-col justify-center items-center sm:gap-y-12 dark:bg-slate-900">
+            <TimeDisplay time={current_time} />
 
-            div {
-                class: "grid grid-cols-1 grid-rows-1 place-items-center scale-75 sm:scale-100",
-                Ring { label: "Minute".into(), percent: percentages.4, radius: 220.0, color: RingColor::Violet }
-                Ring { label: "Hour".into(),   percent: percentages.3, radius: 180.0, color: RingColor::Blue }
-                Ring { label: "Day".into(),    percent: percentages.2, radius: 140.0, color: RingColor::Green }
-                Ring { label: "Month".into(),  percent: percentages.1, radius: 100.0, color: RingColor::Yellow }
-                Ring { label: "Year".into(),   percent: percentages.0, radius: 60.0,  color: RingColor::Red }
-            }
+            <div class="grid grid-cols-1 grid-rows-1 place-items-center scale-75 sm:scale-100">
+                <Ring label="Minute" percent={minute_percentage.into_signal()} radius={220.0} color={RingColor::Violet} />
+                <Ring label="Hour" percent={hour_percentage.into_signal()} radius={180.0} color={RingColor::Blue} />
+                <Ring label="Day" percent={day_percentage.into_signal()} radius={140.0} color={RingColor::Green} />
+                <Ring label="Month" percent={month_percentage.into_signal()} radius={100.0} color={RingColor::Yellow} />
+                <Ring label="Year" percent={year_percentage.into_signal()} radius={60.0} color={RingColor::Red} />
+            </div>
 
-            Appropriation {}
-        }
-    })
+            <Appropriation />
+        </div>
+    }
 }
 
-#[derive(PartialEq, Clone)]
+#[component]
+fn TimeDisplay(time: ReadSignal<Date>) -> impl IntoView {
+    let date = move || time().to_date_string().as_string();
+    let time = move || time().to_locale_time_string("en-US").as_string();
+
+    view! {
+        <div class="flex flex-col items-end gap-y-2 tracking-wide font-bold">
+            <span class="text-xl text-gray-500 dark:text-gray-400">
+                {date}
+            </span>
+            <span class="text-4xl sm:text-7xl text-gray-700 dark:text-gray-300">
+                {time}
+            </span>
+        </div>
+    }
+}
+
+#[component]
+fn Ring(
+    #[prop(optional, into)] label: String,
+    #[prop(into)] percent: Signal<f32>,
+    radius: f32,
+    #[prop(optional)] color: RingColor,
+    #[prop(optional, default = 10.0)] stroke: f32,
+    #[prop(optional)] class: String,
+) -> impl IntoView {
+    let stroke_color = move || color.as_stroke();
+    let fill_color = move || color.as_fill();
+    let diameter = move || radius * 2.0;
+    let normalized_radius = move || radius - stroke * 2.0;
+    let circumference = move || normalized_radius() * 2.0 * std::f32::consts::PI;
+    let stroke_dash_offset = move || circumference() - percent() / 100.0 * circumference();
+
+    view! {
+        <svg
+            class="group row-start-1 row-span-1 col-start-1 col-span-1"
+            width={diameter}
+            height={diameter}
+        >
+            <circle
+                class={format!("transition-[stroke-dashoffset] duration-1000 -rotate-90 origin-center translate-x-0 rounded-[50%] outline-dotted outline-2 outline-transparent group-focus-within:outline-slate-200 {} {}", class, stroke_color())}
+                tabindex="0"
+                stroke-dasharray={format!("{} {}", circumference(), circumference())}
+                stroke-dashoffset={stroke_dash_offset}
+                stroke-width={stroke}
+                stroke-linecap="round"
+                fill="transparent"
+                r={normalized_radius}
+                cx={radius}
+                cy={radius}
+            />
+
+            <defs>
+                <path
+                    id={format!("label-{}", label)}
+                    d={format!(r#"
+                        M 0,{radius}
+                        a {radius},{radius} 0 1,1 {diameter},0
+                        {radius},{radius} 0 1,1 -{diameter},0
+                    "#, radius = radius, diameter = diameter())}
+                />
+            </defs>
+
+            <text
+                class="origin-center rotate-90 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100 tracking-widest"
+            >
+                <textPath
+                    class={format!("text-xs font-bold {} {}", stroke_color(), fill_color())}
+                    href={format!("#label-{}", label)}
+                    alignment-baseline="hanging"
+                >
+                    {label}
+                </textPath>
+            </text>
+        </svg>
+    }
+}
+
+#[derive(PartialEq, Clone, Copy)]
 enum RingColor {
     Gray,
     Red,
@@ -84,124 +164,37 @@ impl RingColor {
     }
 }
 
-#[inline_props]
-fn TimeDisplay(cx: Scope, time: Date) -> Element {
-    let date = time.to_date_string();
-    let time = time.to_locale_time_string("en-US");
+#[component]
+fn Appropriation() -> impl IntoView {
+    view! {
+        <div class="group fixed bottom-10 right-0 left-2">
+            <div class="transition-opacity group-hover:opacity-0 absolute right-6">
+                <Heart />
+            </div>
 
-    cx.render(rsx! {
-        div {
-            class: "flex flex-col items-end gap-y-2 tracking-wide font-bold",
-            span {
-                class: "text-xl text-gray-500 dark:text-gray-400",
-                "{date}"
-            }
-            span {
-                class: "text-4xl sm:text-7xl text-gray-700 dark:text-gray-300",
-                "{time}"
-            }
-        }
-    })
-}
-
-#[inline_props]
-fn Ring(
-    cx: Scope,
-    label: Option<String>,
-    percent: f32,
-    radius: f32,
-    color: Option<RingColor>,
-    stroke: Option<f32>,
-    class: Option<String>,
-) -> Element {
-    let label = label.clone().unwrap_or_default();
-    let stroke = stroke.unwrap_or(10.0);
-    let color = color.clone().unwrap_or_default();
-    let stroke_color = color.as_stroke();
-    let fill_color = color.as_fill();
-    let diameter = radius * 2.0;
-    let normalized_radius = radius - stroke * 2.0;
-    let circumference = normalized_radius * 2.0 * std::f32::consts::PI;
-    let stroke_dash_offset = circumference - percent / 100.0 * circumference;
-    let class = class.clone().unwrap_or_default();
-
-    cx.render(rsx! {
-        svg {
-            class: "group row-start-1 row-span-1 col-start-1 col-span-1",
-            width: "{diameter}",
-            height: "{diameter}",
-
-            circle {
-                class: "{class} {stroke_color} transition-[stroke-dashoffset] duration-1000 -rotate-90 origin-center translate-x-0 rounded-[50%] outline-dotted outline-2 outline-transparent group-focus-within:outline-slate-200",
-                tabindex: "0",
-                stroke_dasharray: "{circumference} {circumference}",
-                stroke_dashoffset: "{stroke_dash_offset}",
-                stroke_width: "{stroke}",
-                stroke_linecap: "round",
-                fill: "transparent",
-                r: "{normalized_radius}",
-                cx: "{radius}",
-                cy: "{radius}"
-            }
-
-            defs {
-                path {
-                    id: "label-{label}",
-                    d: r#"
-                        M 0,{radius}
-                        a {radius},{radius} 0 1,1 {diameter},0
-                        {radius},{radius} 0 1,1 -{diameter},0
-                    "#
-                }
-            }
-
-            text {
-                class: "origin-center rotate-90 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100 tracking-widest",
-                textPath {
-                    href: "#label-{label}",
-                    class: "text-xs font-bold {stroke_color} {fill_color}",
-                    alignment_baseline: "hanging",
-                    "{label}"
-                }
-            }
-        }
-    })
-}
-
-#[inline_props]
-fn Appropriation(cx: Scope) -> Element {
-    cx.render(rsx! {
-        div {
-            class: "group fixed bottom-10 right-0 left-2",
-            div {
-                class: "transition-opacity group-hover:opacity-0 absolute right-6",
-                Heart {}
-            }
-            div {
-                class: "transition-opacity opacity-0 group-hover:opacity-100 absolute right-2 xs:right-6 text-center text-xs text-gray-700 dark:text-gray-400",
+            <div class="transition-opacity opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 absolute right-2 xs:right-6 text-center text-xs text-gray-700 dark:text-gray-400">
                 "Made with "
-                Heart {}
+                <Heart />
                 " by Parker McMullin (aka. "
-                a {
-                    href: "https://twitter.com/parker_codes",
-                    target: "_blank",
-                    "@parker_codes"
-                }
+                <a href="https://twitter.com/parker_codes" target="_blank" tabindex="0">"@parker_codes"</a>
                 ")"
-            }
-        }
-    })
+            </div>
+        </div>
+    }
 }
 
-#[inline_props]
-fn Heart(cx: Scope) -> Element {
-    cx.render(rsx! {
-        span {
-            class: "text-red-500 dark:text-red-700",
+#[component]
+fn Heart() -> impl IntoView {
+    view! {
+        <span class="text-red-500 dark:text-red-700">
             "❤"
-        }
-    })
+        </span>
+    }
 }
+
+/*
+ * Helpers
+ */
 
 fn get_breakdown(current_time: &Date) -> (u32, u32, u32, u32, u32) {
     let month = current_time.get_month() + 1;
