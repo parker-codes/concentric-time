@@ -7,7 +7,6 @@ edition = "2021"
 console_error_panic_hook = "0.1.7"
 js-sys = "0.3.69"
 leptos = { version = "0.6.11", features = ["csr", "nightly"] }
-wasm-bindgen = "0.2.92"
 
 # Defines a size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]

@@ -843,6 +843,12 @@ video {
   }
 }
 
+@media (min-width: 420px) {
+  .xs\:right-6 {
+    right: 1.5rem;
+  }
+}
+
 @media (min-width: 640px) {
   .sm\:scale-100 {
     --tw-scale-x: 1;
