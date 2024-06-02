@@ -21,12 +21,6 @@ fn App() -> impl IntoView {
     let breakdown = move || get_breakdown(&current_time());
     let percentages = move || get_percentages(breakdown());
 
-    let minute_percentage = move || percentages().4;
-    let hour_percentage = move || percentages().3;
-    let day_percentage = move || percentages().2;
-    let month_percentage = move || percentages().1;
-    let year_percentage = move || percentages().0;
-
     // create_effect(move |_| {
     //     logging::log!("minute_percentage = {}", minute_percentage());
     // });
@@ -36,11 +30,11 @@ fn App() -> impl IntoView {
             <TimeDisplay time={current_time} />
 
             <div class="grid grid-cols-1 grid-rows-1 place-items-center scale-75 sm:scale-100">
-                <Ring label="Minute" percent={minute_percentage.into_signal()} radius={220.0} color={RingColor::Violet} />
-                <Ring label="Hour" percent={hour_percentage.into_signal()} radius={180.0} color={RingColor::Blue} />
-                <Ring label="Day" percent={day_percentage.into_signal()} radius={140.0} color={RingColor::Green} />
-                <Ring label="Month" percent={month_percentage.into_signal()} radius={100.0} color={RingColor::Yellow} />
-                <Ring label="Year" percent={year_percentage.into_signal()} radius={60.0} color={RingColor::Red} />
+                <Ring label="Minute" percent={move || percentages().4} radius={220.0} color={RingColor::Violet} />
+                <Ring label="Hour" percent={move || percentages().3} radius={180.0} color={RingColor::Blue} />
+                <Ring label="Day" percent={move || percentages().2} radius={140.0} color={RingColor::Green} />
+                <Ring label="Month" percent={move || percentages().1} radius={100.0} color={RingColor::Yellow} />
+                <Ring label="Year" percent={move || percentages().0} radius={60.0} color={RingColor::Red} />
             </div>
 
             <Appropriation />
@@ -68,7 +62,7 @@ fn TimeDisplay(time: ReadSignal<Date>) -> impl IntoView {
 #[component]
 fn Ring(
     #[prop(optional, into)] label: String,
-    #[prop(into)] percent: Signal<f32>,
+    percent: impl Fn() -> f32 + 'static + Copy,
     radius: f32,
     #[prop(optional)] color: RingColor,
     #[prop(optional, default = 10.0)] stroke: f32,
