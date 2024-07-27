@@ -1,6 +1,8 @@
+#![allow(unused_braces)]
+
 use core::time::Duration;
 use js_sys::Date;
-use leptos::*;
+use leptos::prelude::*;
 
 pub fn main() {
     console_error_panic_hook::set_once();
@@ -10,7 +12,7 @@ pub fn main() {
 
 #[component]
 fn App() -> impl IntoView {
-    let (current_time, set_current_time) = create_signal(Date::new_0());
+    let (current_time, set_current_time) = signal_local(Date::new_0());
     set_interval(
         move || {
             set_current_time(Date::new_0());
@@ -43,7 +45,7 @@ fn App() -> impl IntoView {
 }
 
 #[component]
-fn TimeDisplay(time: ReadSignal<Date>) -> impl IntoView {
+fn TimeDisplay(time: ReadSignal<Date, LocalStorage>) -> impl IntoView {
     let date = move || time().to_date_string().as_string();
     let time = move || time().to_locale_time_string("en-US").as_string();
 
@@ -62,7 +64,7 @@ fn TimeDisplay(time: ReadSignal<Date>) -> impl IntoView {
 #[component]
 fn Ring(
     #[prop(optional, into)] label: String,
-    percent: impl Fn() -> f32 + 'static + Copy,
+    percent: impl Fn() -> f32 + 'static + Copy + Send + Sync,
     radius: f32,
     #[prop(optional)] color: RingColor,
     #[prop(optional, default = 10.0)] stroke: f32,
@@ -96,7 +98,7 @@ fn Ring(
 
             <defs>
                 <path
-                    id={format!("label-{}", label)}
+                    id={format!("label-{}", label.clone())}
                     d={format!(r#"
                         M 0,{radius}
                         a {radius},{radius} 0 1,1 {diameter},0
@@ -110,10 +112,10 @@ fn Ring(
             >
                 <textPath
                     class={format!("text-xs font-bold {} {}", stroke_color(), fill_color())}
-                    href={format!("#label-{}", label)}
+                    href={format!("#label-{}", label.clone())}
                     alignment-baseline="hanging"
                 >
-                    {label}
+                    {label.clone()}
                 </textPath>
             </text>
         </svg>
